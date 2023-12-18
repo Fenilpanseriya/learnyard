@@ -16,11 +16,19 @@ app.use(express.urlencoded({
     extended:true,
 }))
 const options={
-    "origin":"http://localhost:3000"
+    "origin": "*",
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "preflightContinue": true,
+    "optionsSuccessStatus": 204,
+    
+    
 }
-
+//app.options("*",cors({origin:"http://localhost:3000",optionsSuccessStatus:200,credentials:true}))
 app.use(cookieParser());
-app.use(cors(options))
+app.use(cors({
+    origin:["http://localhost:4000"],
+    methods:["GET","POST","DELETE","PUT"]
+}))
 app.use("/api/v1",course);
 app.use("/api/v1",users)
 app.use("/api/v1",payment);

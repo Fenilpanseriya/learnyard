@@ -8,10 +8,11 @@ const options={
     // secure:true,
     sameSite:"none"
 }
-
+    user.token=token;
+    user.save();
     res.status(statusCode).cookie("token",token,options).json({
         success:true,
         message,
-        user
+        user,token
     })
 }

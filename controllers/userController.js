@@ -54,14 +54,22 @@ export const loginUser=catchAsyncEroor(async(req,res,next)=>{
         return next(new ErrorHandler("Incorrect email/password...",401));
     }
     console.log("user is "+user)
+    console.log("req cookie is "+JSON.stringify(res.cookie))
     sendToken(res,user,`welcome back ${user.name}`,201);
     
 })
 
 export const logoutUser=catchAsyncEroor(async(req,res,next)=>{
     res.clearCookie('token');
+    const token=req.headers.Authorization;
+    const user=await User.findOne(token);
+    user.token=null;
+    user.save();
     res.status(200).cookie({
-        "expires":Date(Date.now())
+        "expires":Date(Date.now()+7*24*60*60*1000),
+        httpOnly:true,
+        sameSite:"none"
+
     }).json({
         "success":true,
         "message":"Logedout successfully.."

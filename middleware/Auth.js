@@ -4,7 +4,7 @@ import EroorHandler from "../utils/errorHandler.js";
 import User from "../modles/User.js";
 import nodemailer from "nodemailer"
 export const isAuthenticated=catchAsyncEroor(async(req,res,next)=>{
-    const {token}=req.cookies;
+    const token=req.headers.Authorization;
     console.log("token is "+token)
     if(!token){
         return next(new EroorHandler("Not Logged in please login/signup"),401);
@@ -14,7 +14,7 @@ export const isAuthenticated=catchAsyncEroor(async(req,res,next)=>{
     next();
 })
 export const authorizeAdmin=catchAsyncEroor(async(req,res,next)=>{
-    const {token}=req.cookies;
+    const token=req.headers.Authorization
     console.log("token is "+token)
     console.log("req.user is "+req.user)
     if(!token){
