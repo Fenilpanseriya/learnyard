@@ -7,17 +7,18 @@ const router=express.Router();
 
 router.route("/register").post(singleUpload ,registerUser);
 router.route("/login").post(loginUser);
-router.route("/logout").get(logoutUser);
+router.route("/logoutuser").get(logoutUser);
 router.route("/me").get(isAuthenticated,getMyProfile);
 router.route("/me").delete(isAuthenticated,authorizeAdmin,deleteMyProfile);
 router.route("/changePassword").put(isAuthenticated,changePassword);
-router.route("/updateProfile").put(isAuthenticated,changeProfile);
+router.route("/updateProfile").put(isAuthenticated,singleUpload,changeProfile);
 router.route("/updateProfilePicture").put(isAuthenticated,singleUpload,changeProfilePicture);
 router.route("/forgetPassword").post(forgetPassword);
 router.route("/resetPassword/:token").put(resetPassword);
-router.route("/addtoplaylist").post(isAuthenticated,addToPlaylist);
-router.route("/removefromplaylist").delete(isAuthenticated,removeFromPlaylist);
+
+router.route("/removefromplaylist").post(isAuthenticated,removeFromPlaylist);
 router.route("/admin/users").get(isAuthenticated,authorizeAdmin,getAllUsers);
-router.route("/admin/user/:id").put(isAuthenticated,authorizeAdmin,updateUserRole);
+router.route("/admin/user/:id/:token").put(isAuthenticated,authorizeAdmin,updateUserRole);
 router.route("/admin/user/:id").delete(isAuthenticated,authorizeAdmin,deleteUser);
+router.route("/playlist").post(isAuthenticated,addToPlaylist);
 export default router;

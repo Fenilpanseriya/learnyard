@@ -7,6 +7,7 @@ import payment from "./routes/paymentRoutes.js"
 import errorMiddleware from "./middleware/errorMiddleware.js"
 import cors from "cors";
 import cookieParser from "cookie-parser"
+
 const app=express();
 config({
     path:"./config/config.env"
@@ -23,11 +24,17 @@ const options={
     
     
 }
-//app.options("*",cors({origin:"http://localhost:3000",optionsSuccessStatus:200,credentials:true}))
+//app.options("*",cors({origin:"*",optionsSuccessStatus:200,credentials:true}))
 app.use(cookieParser());
+// app.use(cors({
+//     origin:["http://localhost:3000"],
+//     methods:["GET","POST","DELETE","PUT"]
+// }))
 app.use(cors({
-    origin:["http://localhost:4000"],
-    methods:["GET","POST","DELETE","PUT"]
+    origin:true,
+    credentials:true,
+    methods:["GET","DELETE","PUT","POST"]
+    
 }))
 app.use("/api/v1",course);
 app.use("/api/v1",users)

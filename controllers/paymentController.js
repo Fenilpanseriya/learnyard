@@ -4,7 +4,7 @@ import { instance } from "../server.js";
 import EroorHandler from "../utils/errorHandler.js";
 import Payment from "../modles/Payment.js";
 import crypto from"crypto"
-
+import hmac_sha256 from "crypto"
 export const buyScubscription=catchAsyncEroor(async(req,res,next)=>{
     const user=await User.findById(req.user._id);
     console.log(user.role);
@@ -17,27 +17,47 @@ export const buyScubscription=catchAsyncEroor(async(req,res,next)=>{
         customer_notify:1,
         total_count:12
     })
+    //let id=nanoid(10);
+    var options = {
+        amount: 3000,  // amount in the smallest currency unit
+        currency: "INR",
+        receipt: "order_rcptid_11"
+      };
+      let id;
+      let opt=await instance.orders.create(options, function(err, order) {
+        console.log("order is "+JSON.stringify(order));
+        id=order.id;
+    });
+    console.log("id is "+ id);
     user.subscription.id=subscription.id;
     user.subscription.status=subscription.status;
     await user.save();
     res.status(201).json({
         success:true,
-        subscriptionId:subscription.id
+        subscriptionId:subscription.id,
+        order_id:id
     })
 })
 
 export const paymentVerify=catchAsyncEroor(async(req,res,next)=>{
 
-    const {razorpay_signature,razorpay_payment_id,razorpay_subscription_id}=req.body;
+    const {razorpay_signature,razorpay_payment_id,razorpay_order_id}=req.body;
+    const {order_id}=req.query.order_id;
+    console.log(JSON.stringify(req.body))
+    console.log(JSON.stringify(req.headers));
     const user=await User.findById(req.user._id);
 
     const subscriptionId=user.subscription.id;
-    const generated_signature=crypto.createHmac("sha256",process.env.RAZORPAY_SECRET).update(razorpay_payment_id+"|"+subscriptionId,'utf-8').digest("hex")
-    const isMatch=generated_signature===razorpay_signature;
-    if(!isMatch){
+    //const generated_signature =crypto.createHmac("sha256",process.env.RAZORPAY_SECRET).update(order_id+"|"+razorpay_payment_id,'utf-8').digest("hex")
+    //const generated_signature=crypto.createHmac("sha256",process.env.RAZORPAY_SECRET).update(razorpay_payment_id+"|"+subscriptionId,'utf-8').digest("hex")
+   
+    //const isMatch=generated_signature===razorpay_signature;
+    //console.log("generated sig is "+ generated_signature)
+    console.log("razorpay signature is "+ razorpay_signature)
+    if(!razorpay_signature){
         return res.redirect(`${process.env.FRONTEND_URI}/paymentfail`)
     }
-    await Payment.create({razorpay_signature,razorpay_payment_id,razorpay_subscription_id,})
+    await Payment.create({razorpay_signature,razorpay_payment_id,razorpay_subscription_id:subscriptionId,})
     user.subscription.status="active"
     await user.save()
     res.redirect(`${process.env.FRONTEND_URI}/paymentsuccess?reference=${razorpay_payment_id}`)
@@ -58,7 +78,8 @@ export const cancleSubscription=catchAsyncEroor(async(req,res,next)=>{
     const payment=await Payment.findOne({
         razorpay_subscription_id:subsscriptionid
     })
-    const gap=Date.now()-payment.createdAt;
+    console.log("payment is "+payment);
+    const gap=Date.now()-payment?.createdAt;
     const refundTime=process.env.REFUND_DAYS*24*60*60*1000
     if(gap<refundTime){
         refund=true

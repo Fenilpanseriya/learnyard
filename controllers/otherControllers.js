@@ -27,12 +27,13 @@ export const courseRequest=catchAsyncEroor(async(req,res,next)=>{
 
     await sendEmail(process.env.MAIL,subject,text)
     res.status(200).json({
-        message:"your course request has been sent to Admin"
+        "success":true,
+        "message":"your course request has been sent to Admin"
     })
     
 })
 export const getDashboard=catchAsyncEroor(async(req,res,next)=>{
-    const states=await State.find({}).sort({createdAt:1}).limit(12);
+    const states=await State.find({}).sort({createdAt:-1}).limit(12);
     const statsData=[];
     const require=12-states.length;
     
@@ -50,7 +51,7 @@ export const getDashboard=catchAsyncEroor(async(req,res,next)=>{
     console.log("cuurent data is "+statsData);
     console.log("---------------")
     let usercnt=statsData[11].user;
-    let subscriptioncnt=statsData[11].subscriptions;
+    let subscriptioncnt=statsData[11].subscription;
     let viewscnt=statsData[11].views;
     let userPer=0,subscriptionPer=0,viewPer=0;
 

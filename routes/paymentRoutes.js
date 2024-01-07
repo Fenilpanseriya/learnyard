@@ -7,5 +7,5 @@ const router=express.Router();
 router.route("/subscribe").get(isAuthenticated,buyScubscription)
 router.route("/paymentvarification").post(isAuthenticated,paymentVerify)
 router.route("/getKey").get(isAuthenticated,razorpayKey);
-router.route("/subscribe/cancle").delete(isAuthenticated,cancleSubscription);
+router.route("/subscribe/cancle").get(isAuthenticated,cancleSubscription);
 export default router;

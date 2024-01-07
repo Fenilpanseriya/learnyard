@@ -56,7 +56,11 @@ const schema=mongoose.Schema({
     },
     ResetPasswordToken:String,
     ResetPasswordExpire:String,
-    token:String
+    token:{
+        type:String,
+        default:""
+    }
+    
 })
 schema.methods.getJWTToken=function(){
     return jwt.sign({_id:this._id},process.env.JWT_SECRET,{
